@@ -1,23 +1,34 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<stdbool.h>
+/*
+ ============================================================================
+ Name        : LL with prompt
+ Author      : Lucas Roman
+ Version     : 1.0
+ Copyright   : opensource
+ Description : code for kryptus interview
+ ============================================================================
+ */
 
-struct test_struct
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+struct ll_struct
 {
     int val;
-    struct test_struct *next;
+    struct ll_struct *next;
 };
 
-struct test_struct *head = NULL;
-struct test_struct *curr = NULL;
+struct ll_struct *head = NULL;
+struct ll_struct *curr = NULL;
 
-struct test_struct* create_list(int val)
+
+struct ll_struct* create_list(int val)
 {
-    printf("\n creating list with headnode as [%d]\n",val);
-    struct test_struct *ptr = (struct test_struct*)malloc(sizeof(struct test_struct));
+    struct ll_struct *ptr = (struct ll_struct*)malloc(sizeof(struct ll_struct));
     if(NULL == ptr)
     {
-        printf("\n Node creation failed \n");
+        printf("\n Erro 1 \n");
         return NULL;
     }
     ptr->val = val;
@@ -27,44 +38,32 @@ struct test_struct* create_list(int val)
     return ptr;
 }
 
-struct test_struct* add_to_list(int val, bool add_to_end)
+struct ll_struct* add_to_list(int val)
 {
     if(NULL == head)
     {
         return (create_list(val));
     }
 
-    if(add_to_end)
-        printf("\n Adding node to end of list with value [%d]\n",val);
-    else
-        printf("\n Adding node to beginning of list with value [%d]\n",val);
-
-    struct test_struct *ptr = (struct test_struct*)malloc(sizeof(struct test_struct));
+    struct ll_struct *ptr = (struct ll_struct*)malloc(sizeof(struct ll_struct));
     if(NULL == ptr)
     {
-        printf("\n Node creation failed \n");
+        printf("\n Erro 2 \n");
         return NULL;
     }
     ptr->val = val;
     ptr->next = NULL;
 
-    if(add_to_end)
-    {
-        curr->next = ptr;
-        curr = ptr;
-    }
-    else
-    {
-        ptr->next = head;
-        head = ptr;
-    }
+    curr->next = ptr;
+    curr = ptr;
+    
     return ptr;
 }
 
-struct test_struct* search_in_list(int val, struct test_struct **prev)
+struct ll_struct* search_in_list(int val, struct ll_struct **prev)
 {
-    struct test_struct *ptr = head;
-    struct test_struct *tmp = NULL;
+    struct ll_struct *ptr = head;
+    struct ll_struct *tmp = NULL;
     bool found = false;
 
     printf("\n Searching the list for value [%d] \n",val);
@@ -94,11 +93,59 @@ struct test_struct* search_in_list(int val, struct test_struct **prev)
         return NULL;
     }
 }
+int get_in_list(int val, struct ll_struct **prev)
+{
+    struct ll_struct *ptr = head;
+    struct ll_struct *tmp = NULL;
+    int counter = 0;
+    
+    while(ptr != NULL)
+    {
+        if(counter == val)
+        {
+            return ptr->val;
+            break;
+        }
+        else
+        {
+            tmp = ptr;
+            ptr = ptr->next;
+        }
+        counter++;
+    }
+    return 0;
+    
+}
+
+int delete_in_list(int val, struct ll_struct **prev)
+{
+    struct ll_struct *ptr = head;
+    struct ll_struct *tmp = NULL;
+    int counter = 0;
+    
+    while(ptr != NULL)
+    {
+        if(counter == val)
+        {
+            return ptr->val;
+            break;
+        }
+        else
+        {
+            tmp = ptr;
+            ptr = ptr->next;
+        }
+        counter++;
+    }
+    return -1;
+    
+}
+
 
 int delete_from_list(int val)
 {
-    struct test_struct *prev = NULL;
-    struct test_struct *del = NULL;
+    struct ll_struct *prev = NULL;
+    struct ll_struct *del = NULL;
 
     printf("\n Deleting value [%d] from list\n",val);
 
@@ -130,62 +177,90 @@ int delete_from_list(int val)
 
 void print_list(void)
 {
-    struct test_struct *ptr = head;
-
-    printf("\n -------Printing list Start------- \n");
+    struct ll_struct *ptr = head;
     while(ptr != NULL)
     {
-        printf("\n [%d] \n",ptr->val);
+        printf(" %d ",ptr->val);
         ptr = ptr->next;
     }
-    printf("\n -------Printing list End------- \n");
+    printf("\n");
 
     return;
 }
 
-int main(void)
-{
+void process_entry(char *entry) {
+    char * spaceAdd = NULL; 
+    spaceAdd = strchr(entry,' ');
+    if(spaceAdd){
+        
+
+        char comm[6],commBuffer[6];
+        int i=0;
+        while(entry < spaceAdd){
+              //printf("You entered: %s\n", entry);
+              comm[i] = entry[0];
+              entry++;
+              i++;
+            
+        }
+        int insertion =0;
+        sscanf(entry, "%d", &insertion);
+        strcpy(commBuffer, "put");
+        if( strcmp(comm, commBuffer) == 0)
+        {
+             add_to_list(insertion);
+             print_list();
+        }
+         strcpy(commBuffer, "get");
+        if( strcmp(comm, commBuffer) == 0)
+        {
+            printf("%d \n",get_in_list(insertion,NULL));
+        }
+        	
+        	
+    }else{
+        strcpy(commBuffer, "list");
+        if( strcmp(comm, commBuffer) == 0)
+        {
+            print_list();
+        }
+        strcpy(commBuffer, "first");
+        if( strcmp(comm, commBuffer) == 0)
+        {
+            print_list();
+        }
+        strcpy(commBuffer, "last");
+        if( strcmp(comm, commBuffer) == 0)
+        {
+            print_list();
+        }
+        
+    }
+	
+}
+
+
+int main(int argc, char *argv[]) {
+	char input[201];
     int i = 0, ret = 0;
     struct test_struct *ptr = NULL;
 
     print_list();
 
-    for(i = 5; i<10; i++)
-        add_to_list(i,true);
+	while(1) {
+		printf("prompt> ");
+		if (fgets(input, 200, stdin) == NULL) {
+			printf("An error ocurred.\n");
+			break;
+		}
 
-    print_list();
+		if (strncmp(input, "exit\n", 5) == 0) {
+			printf("Leaving. Good bye.\n");
+			break;
+		}
 
-    for(i = 4; i>0; i--)
-        add_to_list(i,false);
+		process_entry(input);
+	}
 
-    print_list();
-
-    for(i = 1; i<10; i += 4)
-    {
-        ptr = search_in_list(i, NULL);
-        if(NULL == ptr)
-        {
-            printf("\n Search [val = %d] failed, no such element found\n",i);
-        }
-        else
-        {
-            printf("\n Search passed [val = %d]\n",ptr->val);
-        }
-
-        print_list();
-
-        ret = delete_from_list(i);
-        if(ret != 0)
-        {
-            printf("\n delete [val = %d] failed, no such element found\n",i);
-        }
-        else
-        {
-            printf("\n delete [val = %d]  passed \n",i);
-        }
-
-        print_list();
-    }
-
-    return 0;
+	return EXIT_SUCCESS;
 }
